@@ -76,7 +76,7 @@ class Employee(abc.ABC):
         returns None
         """
         # Checks content of email
-        if not email or "@acme-machining.com" not in email:
+        if not isinstance(email, str) or not email or "@acme-machining.com" not in email:
             raise ValueError("Invalid email")
         # sets email
         self._email: str = email
@@ -97,7 +97,7 @@ class Employee(abc.ABC):
         returns None
         """
         # Checks content of name
-        if not name:
+        if not name or not isinstance(name,str):
             raise ValueError("Invalid name")
         # sets name
         self._name: str = name
@@ -118,7 +118,7 @@ class Employee(abc.ABC):
         returns None
         """
         # Checks content of image
-        if not image:
+        if not image or not isinstance(image,str):
             raise ValueError("Invalid image")
         # sets image
         self._image: str = image
@@ -177,7 +177,7 @@ class Salaried(Employee):
         returns None
         """
         # Checks value of yearly
-        if yearly < 50000:
+        if not isinstance(yearly, float) or yearly <= 50000:
             raise ValueError("Invalid yearly salary")
         # sets yearly
         self._yearly: float = yearly
@@ -219,7 +219,7 @@ class Hourly(Employee):
         returns None
         """
         # Checks value of hourly
-        if not 15 < hourly < 99.99:
+        if not 15 < hourly < 99.99 or not isinstance(hourly, float):
             raise ValueError("Invalid hourly salary")
         # sets hourly
         self._hourly: float = hourly
@@ -259,7 +259,7 @@ class Executive(Salaried):
         returns None
         """
         # Checks value of role
-        if not 1 <= role.value <= 3:
+        if not 1 <= role.value <= 3 or not isinstance(role,Role):
             raise InvalidRoleException("Invalid role")
         # sets role
         self._role: Role = role
@@ -294,7 +294,7 @@ class Manager(Salaried):
         returns None
         """
         # Checks value of department
-        if not 1 <= department.value <= 5:
+        if not 1 <= department.value <= 5 or not isinstance(department, Department):
             raise InvalidDepartmentException("Invalid department")
         # sets department
         self._department: Department = department
@@ -377,11 +377,12 @@ class Temporary(Hourly):
         """
         return f"{super().__repr__()},{self.last_day}"
 
-sample_manager = Manager("Julian","julian@acme-machining.com",50001,Department.MACHINING)
+
+sample_manager = Manager("Julian","julian@acme-machining.com",50001.0,Department.MACHINING)
 print(sample_manager.__repr__())
-sample_executive = Executive("Jim","jim@acme-machining.com",50001,Role.CFO)
+sample_executive = Executive("Jim","jim@acme-machining.com",50001.0,Role.CFO)
 print(sample_executive.__repr__())
-sample_temp = Temporary("Randy","randy@acme-machining.com",16,datetime.date.today()+datetime.timedelta(days=90))
+sample_temp = Temporary("Randy","randy@acme-machining.com",16.0,datetime.date.today()+datetime.timedelta(days=90))
 print(sample_temp.__repr__())
-sample_permanent = Permanent("Jim Lahey","lahey@acme-machining.com",99,datetime.date.today())
+sample_permanent = Permanent("Jim Lahey","lahey@acme-machining.com",99.0,datetime.date.today())
 print(sample_permanent.__repr__())
