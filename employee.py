@@ -270,7 +270,7 @@ class Executive(Salaried):
         Executive as type str.
         Returns str.
         """
-        return f"{super().__repr__()},{self.role}"
+        return f"Executive,{super().__repr__()},{self.role}"
 
 class Manager(Salaried):
     """Class holding info for all objects of type Manager."""
@@ -305,7 +305,7 @@ class Manager(Salaried):
         Manager as type str.
         Returns str.
         """
-        return f"{super().__repr__()},{self.department}"
+        return f"Manager,{super().__repr__()},{self.department}"
 
 class Permanent(Hourly):
     """Class holding info for all objects of type Permanent."""
@@ -340,7 +340,7 @@ class Permanent(Hourly):
         Permanent as type str.
         Returns str.
         """
-        return f"{super().__repr__()},{self.hired_date}"
+        return f"Permanent,{super().__repr__()},"+self.hired_date.__repr__().replace(",","!")
 
 class Temporary(Hourly):
     """Class holding info for all objects of type Temporary."""
@@ -375,14 +375,14 @@ class Temporary(Hourly):
         Temporary as type str.
         Returns str.
         """
-        return f"{super().__repr__()},{self.last_day}"
+        return f"Temporary,{super().__repr__()},"+self.last_day.__repr__().replace(",","!")
 
-
-sample_manager = Manager("Julian","julian@acme-machining.com",50001.0,Department.MACHINING)
-print(sample_manager.__repr__())
-sample_executive = Executive("Jim","jim@acme-machining.com",50001.0,Role.CFO)
-print(sample_executive.__repr__())
-sample_temp = Temporary("Randy","randy@acme-machining.com",16.0,datetime.date.today()+datetime.timedelta(days=90))
-print(sample_temp.__repr__())
-sample_permanent = Permanent("Jim Lahey","lahey@acme-machining.com",99.0,datetime.date.today())
-print(sample_permanent.__repr__())
+if __name__ == "__main__":
+    sample_manager = Manager("Julian","julian@acme-machining.com",50001.0,Department.MACHINING)
+    print(sample_manager.__repr__())
+    sample_executive = Executive("Jim","jim@acme-machining.com",50001.0,Role.CFO)
+    print(sample_executive.__repr__())
+    sample_temp = Temporary("Randy","randy@acme-machining.com",16.0,datetime.date.today()+datetime.timedelta(days=90))
+    print(sample_temp.__repr__())
+    sample_permanent = Permanent("Jim Lahey","lahey@acme-machining.com",99.0,datetime.date.today())
+    print(sample_permanent.__repr__())
