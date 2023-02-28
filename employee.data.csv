@@ -1,0 +1,4 @@
+Manager,Julian,julian@acme-machining.com,./images/placeholder.png,50001.0,Department.MACHINING
+Executive,Jim,jim@acme-machining.com,./images/placeholder.png,50001.0,Role.CFO
+Temporary,Randy,randy@acme-machining.com,./images/placeholder.png,16.0,datetime.date(2023! 5! 27)
+Permanent,Jim Lahey,lahey@acme-machining.com,./images/placeholder.png,99.0,datetime.date(2023! 2! 26)

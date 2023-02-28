@@ -143,14 +143,15 @@ class MainWindow(QMainWindow):
         if not index:
             return
         index = index[0].row()
+        curr_employee = self._data[index]
         if isinstance(self._data[index], Executive):
-            self._employee_form = ExecutiveForm(self)
+            self._employee_form = ExecutiveForm(self, curr_employee)
         if isinstance(self._data[index], Manager):
-            self._employee_form = ManagerForm(self)
+            self._employee_form = ManagerForm(self, curr_employee)
         if isinstance(self._data[index], Permanent):
-            self._employee_form = PermanentForm(self)
+            self._employee_form = PermanentForm(self, curr_employee)
         if isinstance(self._data[index], Temporary):
-            self._employee_form = TempForm(self)
+            self._employee_form = TempForm(self, curr_employee)
 
         self._employee_form.fill_in(index)
         self._employee_form.show()
@@ -161,6 +162,7 @@ class MainWindow(QMainWindow):
         with open('employee.data.csv') as datafile:
             reader = csv.reader(datafile, quoting=csv.QUOTE_MINIMAL)
             for row in reader:
+                # will crash if any empty lines are im employee data
                 exec(f"self._data.append({row[0]}(\"{row[1]}\",\"{row[2]}\","
                      f"{row[4]},"+row[5].replace("!",",")+"))")
 
@@ -174,9 +176,12 @@ class MainWindow(QMainWindow):
 class EmployeeForm(QtWidgets.QWidget):
     """There will never be a generic employee form, but we don't want to repeat code
     so we put it all here.  Each subtype of form will add to it."""
-    def __init__(self, parent=None, employee: Employee = None, *args, **kwargs) -> None:
+    def __init__(self, parent, employee: Employee, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         outer_layout = QVBoxLayout()
+        self._employee: Employee = employee
+        self.setFixedSize(400,550)
+        self._parent = parent
         self.layout = QtWidgets.QFormLayout()
         self.setLayout(outer_layout)
         self._id_label = QLabel()
@@ -218,7 +223,7 @@ class EmployeeForm(QtWidgets.QWidget):
             self._image_path_edit.setText('')
         else:
             self._image_path_edit.setText(self._employee.image)
-        self._image.setPixmap(QPixmap(self._employee.image))
+        self._image.setPixmap(QPixmap(self._employee.image).scaled(300, 300))
         self.show()
 
 
@@ -226,66 +231,73 @@ class EmployeeForm(QtWidgets.QWidget):
 # their custom information.
 
 class SalariedForm(EmployeeForm):
-    def __init__(self, parent):
-        super().__init__(parent=parent)
+    def __init__(self, parent, employee):
+        super().__init__(parent, employee)
+        self.layout.addRow(QLabel("Salary:"), self._pay_edit)
 
     def fill_in(self, index) -> None:
         super().fill_in(index)
-        # self.layout.addRow(QLabel("Salary:"), self._pay_edit)
+        self._pay_edit.setText(str(self._employee.yearly))
 
     def update_employee(self) -> None:
-        self._employee.yearly = self._pay_edit.text()
+        self._employee.yearly = int(self._pay_edit.text())
 class ExecutiveForm(SalariedForm):
-    def __init__(self, parent):
-        super().__init__(parent)
+    def __init__(self, parent, employee):
+        super().__init__(parent, employee)
+        self.cb = QComboBox()
+        self.cb.addItems(role.name.upper() for role in Role)
+        self.layout.addRow(self.cb)
 
     def fill_in(self, index) -> None:
         super().fill_in(index)
-        self.layout.addRow(QLabel("Hourly Wage:"), self._pay_edit)
-        self._pay_edit.setText(self._employee.hourly)
-class ManagerForm(SalariedForm):
-    def __init__(self, parent):
-        super().__init__(parent)
-        self._dept_label = QLabel("Head of Department:")
-        self._dept_selector = QComboBox(QLabel("Departments"))
-    def fill_in(self, index) -> None:
-        super().fill_in(index)
-        # self.layout.addRow(QLabel("Select:"), self._dept_selector)
-        # self.layout.addRow(self._dept_label)
-        # self._dept_label.setText(self._employee.department)
+        self.layout.addRow(self.cb)
+
     def update_employee(self) -> None:
         super().update_employee()
-        self._employee.department = self._dept_selector.currentText()
+        self._employee.role = self.cb.currentText().capitalize()
 
-
-class HourlyForm(EmployeeForm):
-    def __init__(self,parent):
-        super().__init__(parent=parent)
+class ManagerForm(SalariedForm):
+    def __init__(self, parent, employee):
+        super().__init__(parent, employee)
+        self.dept_cb = QComboBox()
+        self.dept_cb.addItems(dept.name.title() for dept in Department)
+        self.layout.addRow(self.dept_cb)
 
     def fill_in(self, index) -> None:
         super().fill_in(index)
+        self.layout.addRow(self.dept_cb)
+
+    def update_employee(self) -> None:
+        super().update_employee()
+        self._employee.role = self.dept_cb.currentText()
+class HourlyForm(EmployeeForm):
+    def __init__(self,parent, employee):
+        super().__init__(parent, employee)
         self.layout.addRow(QLabel("Hourly:"), self._pay_edit)
+    def fill_in(self, index) -> None:
+        super().fill_in(index)
+        self._pay_edit.setText(str(self._employee.hourly))
     def update_employee(self) -> None:
         super().update_employee()
         self._employee.hourly = self._pay_edit.text()
 
 
 class TempForm(HourlyForm):
-    def __init__(self,parent):
-        super().__init__(parent)
-        self._last_day_label = QLabel("Last day: ")
+    def __init__(self, parent, employee):
+        super().__init__(parent, employee)
+
+
     def fill_in(self, index) -> None:
         super().fill_in(index)
-        self.layout.addRow(self._last_day_label)
-        self._last_day_label.setText(self._employee.last_day)
+        self.layout.addRow(QLabel("Last day: "), QLabel(str(self._employee.last_day)))
 
 class PermanentForm(HourlyForm):
-    def __init__(self,parent):
-        super().__init__(parent)
-        self._hired_date_label = QLabel("Hired date: ")
+    def __init__(self, parent, employee):
+        super().__init__(parent, employee)
+
     def fill_in(self, index) -> None:
-        self._hired_date_label.setText(self._employee.hired_date)
-        self.layout.addRow(self._hired_date_label)
+        super().fill_in(index)
+        self.layout.addRow(QLabel("Dired date: "), QLabel(str(self._employee.hired_date)))
 class AboutForm(QtWidgets.QWidget):
     """An About Form just gives information about our app to users who want to see it.  Automatically
     sets itself visible on creation."""
