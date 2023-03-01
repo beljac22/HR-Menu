@@ -379,7 +379,7 @@ class Temporary(Hourly):
 
 if __name__ == "__main__":
     sample_manager = Manager("Julian","julian@acme-machining.com",50001.0,Department.MACHINING)
-    print(sample_manager)
+    print(sample_manager.__repr__())
     sample_executive = Executive("Jim","jim@acme-machining.com",50001.0,Role.CFO)
     print(sample_executive.__repr__())
     sample_temp = Temporary("Randy","randy@acme-machining.com",16.0,datetime.date.today()+datetime.timedelta(days=90))
