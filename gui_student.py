@@ -165,12 +165,13 @@ class MainWindow(QMainWindow):
                 # will crash if any empty lines are im employee data
                 exec(f"self._data.append({row[0]}(\"{row[1]}\",\"{row[2]}\","
                      f"{row[4]},"+row[5].replace("!",",")+"))")
+                self._data[-1].image = row[3]
+
 
     def save_file(self) -> None:
         """Save a representation of all the Employees to a file."""
         with open("employee.data.csv", "w") as file:
             for employee in self._data:
-                print(employee)
                 file.write(f"{employee.__repr__()}\n")
 
 class EmployeeForm(QtWidgets.QWidget):
@@ -194,7 +195,8 @@ class EmployeeForm(QtWidgets.QWidget):
         self._image_path_edit = QLineEdit()
         self.layout.addRow(QLabel("Image path:"), self._image_path_edit)
         self._image = QLabel()
-        self._image.setPixmap(QPixmap(Employee.IMAGE_PLACEHOLDER))
+        print(self._employee.image)
+        self._image.setPixmap(QPixmap(self._employee.image))
         self.layout.addWidget(self._image)
         update = QPushButton("Update")
         update.clicked.connect(self.update_employee)
@@ -205,9 +207,13 @@ class EmployeeForm(QtWidgets.QWidget):
 
     def update_employee(self) -> None:
         """Change the selected employee's data to the updated values."""
-        self._employee.name = self._name_edit.text()
+        try:
+            self._employee.name = self._name_edit.text()
+        except ValueError:
+            print("ERROR FOUND")
         self._employee.email = self._email_edit.text()
         self._employee.image = self._image_path_edit.text()
+        print(self._employee.image)
         self._parent.refresh_width()
         self.setVisible(False)
 
@@ -240,7 +246,11 @@ class SalariedForm(EmployeeForm):
         self._pay_edit.setText(str(self._employee.yearly))
 
     def update_employee(self) -> None:
-        self._employee.yearly = int(self._pay_edit.text())
+        super().update_employee()
+        self._employee.yearly = float(self._pay_edit.text())
+        print(self._employee.yearly)
+        print("TEST")
+
 class ExecutiveForm(SalariedForm):
     def __init__(self, parent, employee):
         super().__init__(parent, employee)
@@ -254,13 +264,13 @@ class ExecutiveForm(SalariedForm):
 
     def update_employee(self) -> None:
         super().update_employee()
-        self._employee.role = self.cb.currentText().capitalize()
+        self._employee.role = Role[self.cb.currentText().upper()]
 
 class ManagerForm(SalariedForm):
     def __init__(self, parent, employee):
         super().__init__(parent, employee)
         self.dept_cb = QComboBox()
-        self.dept_cb.addItems(dept.name.title() for dept in Department)
+        self.dept_cb.addItems(dept.name.title().replace("_"," ") for dept in Department)
         self.layout.addRow(self.dept_cb)
 
     def fill_in(self, index) -> None:
@@ -269,7 +279,7 @@ class ManagerForm(SalariedForm):
 
     def update_employee(self) -> None:
         super().update_employee()
-        self._employee.role = self.dept_cb.currentText()
+        self._employee.department = Department[self.dept_cb.currentText().upper()]
 class HourlyForm(EmployeeForm):
     def __init__(self,parent, employee):
         super().__init__(parent, employee)
@@ -279,7 +289,7 @@ class HourlyForm(EmployeeForm):
         self._pay_edit.setText(str(self._employee.hourly))
     def update_employee(self) -> None:
         super().update_employee()
-        self._employee.hourly = self._pay_edit.text()
+        self._employee.hourly = float(self._pay_edit.text())
 
 
 class TempForm(HourlyForm):
