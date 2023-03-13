@@ -1,9 +1,11 @@
 import abc
 from enum import Enum
 import datetime
+from os import path
 
 class Role(Enum):
     """
+    Jack Bellgowan
     Enumeration holding variables associating to manager types 1-3
     """
     CEO = 1
@@ -12,6 +14,7 @@ class Role(Enum):
 
 class Department(Enum):
     """
+    Jack Bellgowan
     Enumeration holding variables associating to department types 1-5
     """
     ACCOUNTING = 1
@@ -22,6 +25,7 @@ class Department(Enum):
 
 class InvalidRoleException(Exception):
     """
+    Jack Bellgowan
     Custom exception type raised when invalid role is given
     """
     def __init__(self, message: str):
@@ -33,10 +37,12 @@ class InvalidRoleException(Exception):
 
 class InvalidDepartmentException(Exception):
     """
+    Jack Bellgowan
     Custom exception type raised when invalid department is given
     """
     def __init__(self, message: str):
         """
+        Jack Bellgowan
         Excepts message as a str parameter, raises an exception called
         InvalidDepartment Exception with the message var as a message
         """
@@ -44,12 +50,14 @@ class InvalidDepartmentException(Exception):
 
 class Employee(abc.ABC):
     """
+    Jack Bellgowan
     Abstract Basic class holding info about an object of parent type employee
     """
     CURRENT_ID: int = 1
     IMAGE_PLACEHOLDER: str = "./images/placeholder.png"
     def __init__(self, name: str, email: str):
         """
+        Jack Bellgowan
         Accepts employee name as a str, and email as a str.
         """
         self.name: str = name
@@ -62,6 +70,7 @@ class Employee(abc.ABC):
     @property
     def email(self) -> str:
         """
+        Jack Bellgowan
         getter for self._email
         returns str
         """
@@ -70,6 +79,7 @@ class Employee(abc.ABC):
     @email.setter
     def email(self, email: str) -> None:
         """
+        Jack Bellgowan
         Setter for self._email, checks if email is empty or not
         the correct domain.
         Raises ValueError if email is invalid.
@@ -84,6 +94,7 @@ class Employee(abc.ABC):
     @property
     def name(self) -> str:
         """
+        Jack Bellgowan
         getter for self._name
         returns str
         """
@@ -92,6 +103,7 @@ class Employee(abc.ABC):
     @name.setter
     def name(self, name: str) -> None:
         """
+        Jack Bellgowan
         Setter for self._name, checks if name is empty.
         Raises ValueError if name is invalid.
         returns None
@@ -105,6 +117,7 @@ class Employee(abc.ABC):
     @property
     def image(self) -> str:
         """
+        Jack Bellgowan
         getter for self._image
         Returns str
         """
@@ -113,12 +126,13 @@ class Employee(abc.ABC):
     @image.setter
     def image(self, image: str) -> None:
         """
+        Jack Bellgowan
         Setter for self._image, checks if image is empty.
         Raises ValueError if image is invalid.
         returns None
         """
         # Checks content of image
-        if not image or not isinstance(image,str):
+        if not image or not isinstance(image,str) or not path.exists(image):
             raise ValueError("Invalid image")
         # sets image
         self._image: str = image
@@ -126,6 +140,7 @@ class Employee(abc.ABC):
     @property
     def id_number(self) -> int:
         """
+        Jack Bellgowan
         getter for self._id_number
         returns int
         """
@@ -133,6 +148,7 @@ class Employee(abc.ABC):
 
     def __str__(self) -> str:
         """
+        Jack Bellgowan
         returns basic text representation of an object of type
         Employee as type str.
         Returns str.
@@ -141,20 +157,22 @@ class Employee(abc.ABC):
 
     @abc.abstractmethod
     def calc_pay(self) -> float:
-        """This function calculates the weekly pay
+        """Jack Bellgowan
+        This function calculates the weekly pay
         for the current employee in our pay report"""
         pass
 
     def __repr__(self) -> str:
-        """
+        """Jack Bellgowan
         returns complex text representation of an object of type
         Employee as type str.
         Returns str.
         """
-        return f"{self.name},{self.email},{self.IMAGE_PLACEHOLDER}"
+        return f"{self.name},{self.email},{self.image}"
 
 class Salaried(Employee):
-    """Class holding info for all objects of type Salaried."""
+    """Jack Bellgowan
+    Class holding info for all objects of type Salaried."""
     def __init__(self, name: str, email: str, yearly: float):
         """constructor"""
         super().__init__(name, email)
@@ -162,7 +180,7 @@ class Salaried(Employee):
 
     @property
     def yearly(self) -> float:
-        """
+        """Jack Bellgowan
         getter for self._yearly
         Returns float
         """
@@ -170,7 +188,7 @@ class Salaried(Employee):
 
     @yearly.setter
     def yearly(self, yearly: float) -> None:
-        """
+        """Jack Bellgowan
         Setter for self._yearly, checks if yearly is non-negative and
         over 50000.
         Raises ValueError if yearly is invalid.
@@ -183,7 +201,8 @@ class Salaried(Employee):
         self._yearly: float = yearly
 
     def calc_pay(self) -> float:
-        """This function calculates the weekly pay
+        """Jack Bellgowan
+        This function calculates the weekly pay
         for the current salaried employee in our pay report"""
         return self.yearly / 52
 
@@ -196,7 +215,8 @@ class Salaried(Employee):
         return f"{super().__repr__()},{self.yearly}"
 
 class Hourly(Employee):
-    """Class holding info for all objects of type Hourly."""
+    """Jack Bellgowan
+    Class holding info for all objects of type Hourly."""
     def __init__(self, name: str, email: str, hourly: float):
         """constructor"""
         super().__init__(name, email)
@@ -204,7 +224,7 @@ class Hourly(Employee):
 
     @property
     def hourly(self) -> float:
-        """
+        """Jack Bellgowan
         getter for self._hourly
         Returns float
         """
@@ -212,7 +232,7 @@ class Hourly(Employee):
 
     @hourly.setter
     def hourly(self, hourly: float) -> None:
-        """
+        """Jack Bellgowan
         Setter for self._hourly, checks if hourly is
         between 15 and 99.99.
         Raises ValueError if hourly is invalid.
@@ -225,12 +245,13 @@ class Hourly(Employee):
         self._hourly: float = hourly
 
     def calc_pay(self) -> float:
-        """This function calculates the weekly pay
+        """Jack Bellgowan
+        This function calculates the weekly pay
         for the current hourly employee in our pay report"""
         return self.hourly * 40
 
     def __repr__(self) -> str:
-        """
+        """Jack Bellgowan
         returns complex text representation of an object of type
         Hourly as type str.
         Returns str.
@@ -238,14 +259,15 @@ class Hourly(Employee):
         return f"{super().__repr__()},{self.hourly}"
 
 class Executive(Salaried):
-    """Class holding info for all objects of type Executive."""
+    """Jack Bellgowan
+    Class holding info for all objects of type Executive."""
     def __init__(self, name: str, email: str, yearly: float, role: Role):
         super().__init__(name, email, yearly)
         self.role: Role = role
 
     @property
     def role(self) -> Role:
-        """
+        """Jack Bellgowan
         getter for self._yearly
         Returns Role
         """
@@ -253,19 +275,19 @@ class Executive(Salaried):
 
     @role.setter
     def role(self, role: Role) -> None:
-        """
+        """Jack Bellgowan
         Setter for self._role, checks if role is not 1-3
         Raises an InvalidRoleException if role is invalid.
         returns None
         """
         # Checks value of role
-        if not 1 <= role.value <= 3 or not isinstance(role,Role):
+        if not 1 <= role.value <= 3 or not isinstance(role, Role):
             raise InvalidRoleException("Invalid role")
         # sets role
         self._role: Role = role
 
     def __repr__(self) -> str:
-        """
+        """Jack Bellgowan
         returns complex text representation of an object of type
         Executive as type str.
         Returns str.
@@ -273,14 +295,15 @@ class Executive(Salaried):
         return f"Executive,{super().__repr__()},{self.role}"
 
 class Manager(Salaried):
-    """Class holding info for all objects of type Manager."""
+    """Jack Bellgowan
+    Class holding info for all objects of type Manager."""
     def __init__(self, name: str, email: str, yearly: float, department: Department):
         super().__init__(name, email, yearly)
         self.department: Department = department
 
     @property
     def department(self) -> Department:
-        """
+        """Jack Bellgowan
         getter for self._yearly
         Returns Department
         """
@@ -288,7 +311,7 @@ class Manager(Salaried):
 
     @department.setter
     def department(self, department: Department) -> None:
-        """
+        """Jack Bellgowan
         Setter for self._department, checks if role is not 1-5
         Raises an InvalidDepartmentException if department is invalid.
         returns None
@@ -300,7 +323,7 @@ class Manager(Salaried):
         self._department: Department = department
 
     def __repr__(self) -> str:
-        """
+        """Jack Bellgowan
         returns complex text representation of an object of type
         Manager as type str.
         Returns str.
@@ -308,14 +331,15 @@ class Manager(Salaried):
         return f"Manager,{super().__repr__()},{self.department}"
 
 class Permanent(Hourly):
-    """Class holding info for all objects of type Permanent."""
+    """Jack Bellgowan
+    Class holding info for all objects of type Permanent."""
     def __init__(self, name: str, email: str, hourly: float, hired_date: datetime.date):
         super().__init__(name, email, hourly)
         self.hired_date: datetime.date = hired_date
 
     @property
     def hired_date(self) -> datetime.date:
-        """
+        """Jack Bellgowan
         getter for self._hired_date
         Returns datetime
         """
@@ -323,7 +347,7 @@ class Permanent(Hourly):
 
     @hired_date.setter
     def hired_date(self, hired_date: datetime.date) -> None:
-        """
+        """Jack Bellgowan
         Setter for self._hired_date, checks if argument is datetime object
         Raises a ValueError if hired_date is invalid.
         returns None
@@ -335,7 +359,7 @@ class Permanent(Hourly):
         self._hired_date: datetime.date = hired_date
 
     def __repr__(self) -> str:
-        """
+        """Jack Bellgowan
         returns complex text representation of an object of type
         Permanent as type str.
         Returns str.
@@ -343,14 +367,15 @@ class Permanent(Hourly):
         return f"Permanent,{super().__repr__()},"+self.hired_date.__repr__().replace(",","!")
 
 class Temporary(Hourly):
-    """Class holding info for all objects of type Temporary."""
+    """Jack Bellgowan
+    Class holding info for all objects of type Temporary."""
     def __init__(self, name: str, email: str, hourly: float, last_day: datetime.date):
         super().__init__(name, email, hourly)
         self.last_day: datetime.date = last_day
 
     @property
     def last_day(self) -> datetime.date:
-        """
+        """Jack Bellgowan
         getter for self._hired_date
         Returns datetime
         """
@@ -358,7 +383,7 @@ class Temporary(Hourly):
 
     @last_day.setter
     def last_day(self, last_day: datetime.date) -> None:
-        """
+        """Jack Bellgowan
         Setter for self._last_day, checks if argument is datetime object
         Raises a ValueError if last_day is invalid.
         returns None
@@ -370,19 +395,9 @@ class Temporary(Hourly):
         self._last_day: datetime.date = last_day
 
     def __repr__(self) -> str:
-        """
+        """Jack Bellgowan
         returns complex text representation of an object of type
         Temporary as type str.
         Returns str.
         """
         return f"Temporary,{super().__repr__()},"+self.last_day.__repr__().replace(",","!")
-
-if __name__ == "__main__":
-    sample_manager = Manager("Julian","julian@acme-machining.com",50001.0,Department.MACHINING)
-    print(sample_manager.__repr__())
-    sample_executive = Executive("Jim","jim@acme-machining.com",50001.0,Role.CFO)
-    print(sample_executive.__repr__())
-    sample_temp = Temporary("Randy","randy@acme-machining.com",16.0,datetime.date.today()+datetime.timedelta(days=90))
-    print(sample_temp.__repr__())
-    sample_permanent = Permanent("Jim Lahey","lahey@acme-machining.com",99.0,datetime.date.today())
-    print(sample_permanent.__repr__())
