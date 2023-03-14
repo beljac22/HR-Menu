@@ -207,7 +207,7 @@ class Salaried(Employee):
         return self.yearly / 52
 
     def __repr__(self) -> str:
-        """
+        """Jack Bellgowan
         returns complex text representation of an object of type
         Salaried as type str.
         Returns str.
@@ -218,7 +218,11 @@ class Hourly(Employee):
     """Jack Bellgowan
     Class holding info for all objects of type Hourly."""
     def __init__(self, name: str, email: str, hourly: float):
-        """constructor"""
+        """Jack Bellgowan
+        constructor taking name as a type str corresponding to employee name,
+        email as a type str corresponding to employee email, and hourly as a float
+         corresponding to employee wage
+        """
         super().__init__(name, email)
         self.hourly: float = hourly
 
@@ -262,7 +266,14 @@ class Executive(Salaried):
     """Jack Bellgowan
     Class holding info for all objects of type Executive."""
     def __init__(self, name: str, email: str, yearly: float, role: Role):
+        """Jack Bellgowan
+        constructor taking name as a type str corresponding to employee name,
+        email as a type str corresponding to employee email, Role for the employee's Role, and yearly as a float
+        corresponding to employee salaru
+        returns None
+        """
         super().__init__(name, email, yearly)
+        # sets the employee's Role
         self.role: Role = role
 
     @property
@@ -298,7 +309,14 @@ class Manager(Salaried):
     """Jack Bellgowan
     Class holding info for all objects of type Manager."""
     def __init__(self, name: str, email: str, yearly: float, department: Department):
+        """Jack Bellgowan
+        constructor taking name as a type str corresponding to employee name,
+        email as a type str corresponding to employee email, an employee department
+        for their department and yearly as a float
+        corresponding to employee salary
+        """
         super().__init__(name, email, yearly)
+        # sets employee department
         self.department: Department = department
 
     @property
@@ -334,6 +352,13 @@ class Permanent(Hourly):
     """Jack Bellgowan
     Class holding info for all objects of type Permanent."""
     def __init__(self, name: str, email: str, hourly: float, hired_date: datetime.date):
+        """
+        Jack Bellgowan
+        constructor taking name as a type str corresponding to employee name,
+        email as a type str corresponding to employee email, an employee department
+        for their department and hourly as a float
+        corresponding to employee wage, and hired date
+        """
         super().__init__(name, email, hourly)
         self.hired_date: datetime.date = hired_date
 
@@ -370,6 +395,12 @@ class Temporary(Hourly):
     """Jack Bellgowan
     Class holding info for all objects of type Temporary."""
     def __init__(self, name: str, email: str, hourly: float, last_day: datetime.date):
+        """Jack Bellgowan
+        constructor taking name as a type str corresponding to employee name,
+        email as a type str corresponding to employee email, an employee department
+        for their department and hourly as a float
+        corresponding to employee wage, and ending date
+        """
         super().__init__(name, email, hourly)
         self.last_day: datetime.date = last_day
 

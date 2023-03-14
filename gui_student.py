@@ -15,13 +15,15 @@ from PyQt6.QtGui import QPixmap, QAction
 from PyQt6.QtWidgets import QLabel, QLineEdit, QMenu, QHeaderView, QTableView, QMainWindow, QAbstractItemView, \
     QPushButton, QVBoxLayout, QListWidget, QListWidgetItem, QComboBox, QApplication, QMessageBox
 import sys
+from abc import ABC
 
 from employee import *
 from typing import *
 
 
 class HRTableModel(QAbstractTableModel):
-    """The HRTableModel allows us to display our information in a QTableView."""
+    """
+    The HRTableModel allows us to display our information in a QTableView."""
     def __init__(self, data) -> None:
         super(HRTableModel, self).__init__()
         self._columns = ["ID#", "Type", "Name", "Pay", "Email"]
@@ -144,44 +146,56 @@ class MainWindow(QMainWindow):
         index = index[0].row()
         curr_employee = self._data[index]
         if isinstance(self._data[index], Executive):
+            # passes the parent window and current employee into the instance of the class
             self._employee_form = ExecutiveForm(self, curr_employee)
         if isinstance(self._data[index], Manager):
+            # passes the parent window and current employee into the instance of the class
             self._employee_form = ManagerForm(self, curr_employee)
         if isinstance(self._data[index], Permanent):
+            # passes the parent window and current employee into the instance of the class
             self._employee_form = PermanentForm(self, curr_employee)
         if isinstance(self._data[index], Temporary):
+            # passes the parent window and current employee into the instance of the class
             self._employee_form = TempForm(self, curr_employee)
-
         self._employee_form.fill_in(index)
         self._employee_form.show()
 
     def load_file(self) -> None:
-        """Read a representation of all of our Employees from a file and store in our
+        """Jack Bellgowan
+        Read a representation of all of our Employees from a file and store in our
         _data variable.  The table will automatically be populated by this variable."""
         with open('employee.data.csv') as datafile:
             reader = csv.reader(datafile, quoting=csv.QUOTE_MINIMAL)
             for row in reader:
-                # will crash if any empty lines are im employee data
+                # will crash if any empty lines are im employee data, appends
+                # a version of the class specified in the save file by converting it from text to a python command
                 exec(f"self._data.append({row[0]}(\"{row[1]}\",\"{row[2]}\","
                      f"{row[4]},"+row[5].replace("!",",")+"))")
+                # sets the object that was created to have an image from the save file
                 self._data[-1].image = row[3]
 
 
     def save_file(self) -> None:
-        """Save a representation of all the Employees to a file."""
+        """Jack Bellgowan
+        Save a representation of all the Employees to a file."""
+        # opens the employee save file
         with open("employee.data.csv", "w") as file:
+            # iterates over each employee
             for employee in self._data:
+                # adds each employee to the save file
                 file.write(f"{employee.__repr__()}\n")
 
 class EmployeeForm(QtWidgets.QWidget):
-    """There will never be a generic employee form, but we don't want to repeat code
+    """There will never be a generic employee form, but we don't want to repeat code,
     so we put it all here.  Each subtype of form will add to it."""
     def __init__(self, parent: QApplication, employee: Employee, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         outer_layout = QVBoxLayout()
+        # object of type Employee corresponding to what type of form the window is
         self._employee: Employee = employee
-        #
+        # Sets size of window to make image fit
         self.setFixedSize(400,550)
+        # parent application of the form
         self._parent: QApplication = parent
         self.layout = QtWidgets.QFormLayout()
         self.setLayout(outer_layout)
@@ -202,19 +216,24 @@ class EmployeeForm(QtWidgets.QWidget):
         outer_layout.addLayout(self.layout)
         outer_layout.addWidget(update)
         self.setWindowModality(Qt.WindowModality.ApplicationModal)
-        #
+        # message box object
         self._msg: QMessageBox = QMessageBox()
-        #
+        # sets Icon of the window
         self._msg.setIcon(QMessageBox.Icon.Warning)
-        self.show()
 
     def update_employee(self) -> None:
         """Change the selected employee's data to the updated values."""
+        # tries to change the image, name and email of employee, shows the error window if
+        # the input is invalid
         try:
+            # changes employee name
             self._employee.name = self._name_edit.text()
+            # changes employee name
             self._employee.email = self._email_edit.text()
+            # changes employee name
             self._employee.image = self._image_path_edit.text()
         except ValueError as error:
+            # opens error window
             self.error_handler(error)
         self._parent.refresh_width()
         self.setVisible(False)
@@ -227,17 +246,26 @@ class EmployeeForm(QtWidgets.QWidget):
         self._id_label.setText(str(self._employee.id_number))
         self._name_edit.setText(self._employee.name)
         self._email_edit.setText(self._employee.email)
-        if self._employee.image == "placeholder":
+        if self._employee.image == Employee.IMAGE_PLACEHOLDER:
             self._image_path_edit.setText('')
         else:
             self._image_path_edit.setText(self._employee.image)
+        # makes the image the same size regardless of resolution, places image
         self._image.setPixmap(QPixmap(self._employee.image).scaled(300, 300))
         self.show()
 
-    def error_handler(self, e: str) -> None:
-        self._msg.setText(str(e))
+    def error_handler(self, error_message: str) -> None:
+        """ Tim Lightner
+        Accepts error message as a str, returns None.
+        Triggers an error pop up message with a specified message
+        """
+        # sets text to the text of the error message
+        self._msg.setText(str(error_message))
+        # sets the title of the window
         self._msg.setWindowTitle("Error")
+        # places OK button
         self._msg.setStandardButtons(QMessageBox.StandardButton.Ok)
+        # creates window
         self._msg.exec()
 
 
@@ -245,34 +273,68 @@ class EmployeeForm(QtWidgets.QWidget):
 # their custom information.
 
 class SalariedForm(EmployeeForm):
-    def __init__(self, parent, employee):
+    """Jack Bellgowan
+    Object of type salaried, never referenced directly
+    """
+    def __init__(self, parent: MainWindow, employee: Employee):
+        """Jack Bellgowan
+        takes parent as a type Parent, and employee as type Employee
+        Constructor for object of type SalariedForm
+        returns None
+        """
+        # super class's constructor
         super().__init__(parent, employee)
+        # adds a row corresponding to pay amount
         self.layout.addRow(QLabel("Salary:"), self._pay_edit)
 
-    def fill_in(self, index) -> None:
+    def fill_in(self, index: int) -> None:
+        """Jack Bellgowan
+        fills in the employee info to the window
+        Accepts index as an int argument
+        Returns None
+        """
+        # super class's fill_in() method
         super().fill_in(index)
+        # sets the text to the employee's yearly salary
         self._pay_edit.setText(str(self._employee.yearly))
 
     def update_employee(self) -> None:
+        """Jack Bellgowan
+        Updates the employee info stored in self._employee
+        returns None
+        """
+        # super class's fill_in() method
         super().update_employee()
+        # checks if salary is blank
         if self._pay_edit.text():
+            # sets salary to float value of text box
             self._employee.yearly = float(self._pay_edit.text())
         else:
+            # raises error message to be handled elsewhere
             raise ValueError('Salary cannot be blank')
 
 class ExecutiveForm(SalariedForm):
     def __init__(self, parent, employee):
+        """Jack Bellgowan
+
+        """
         super().__init__(parent, employee)
         self._role_cb = QComboBox()
         self._role_cb.addItems(role.name.upper() for role in Role)
         self.layout.addRow(self._role_cb)
 
     def fill_in(self, index) -> None:
+        """Jack Bellgowan
+
+        """
         super().fill_in(index)
         self.layout.addRow(self._role_cb)
         self._role_cb.setCurrentIndex([role for role in Role].index(self._employee.role))
 
     def update_employee(self) -> None:
+        """Jack Bellgowan
+
+        """
         try:
             super().update_employee()
             self._employee.role = Role[self._role_cb.currentText().upper()]
@@ -281,7 +343,13 @@ class ExecutiveForm(SalariedForm):
 
 
 class ManagerForm(SalariedForm):
+    """Jack Bellgowan
+
+    """
     def __init__(self, parent, employee):
+        """Jack Bellgowan
+
+        """
         super().__init__(parent, employee)
         self.dept_cb = QComboBox()
         self.dept_cb_items = [dept.name.title().replace("_"," ") for dept in Department]
@@ -289,11 +357,17 @@ class ManagerForm(SalariedForm):
         self.layout.addRow(self.dept_cb)
 
     def fill_in(self, index) -> None:
+        """Jack Bellgowan
+
+        """
         super().fill_in(index)
         self.layout.addRow(self.dept_cb)
         self.dept_cb.setCurrentIndex([dept for dept in Department].index(self._employee.department))
 
     def update_employee(self) -> None:
+        """Jack Bellgowan
+
+        """
         try:
             super().update_employee()
             self._employee.department = Department[self.dept_cb.currentText().upper().replace(" ","_")]
@@ -301,14 +375,26 @@ class ManagerForm(SalariedForm):
             self.error_handler(error)
 
 class HourlyForm(EmployeeForm):
+    """Jack Bellgowan
+
+    """
     def __init__(self,parent, employee):
+        """Jack Bellgowan
+
+        """
         super().__init__(parent, employee)
         self.layout.addRow(QLabel("Hourly:"), self._pay_edit)
     def fill_in(self, index) -> None:
+        """Jack Bellgowan
+
+        """
         super().fill_in(index)
         self._pay_edit.setText(str(self._employee.hourly))
 
     def update_employee(self) -> None:
+        """Jack Bellgowan
+
+        """
         try:
             super().update_employee()
             self._employee.hourly = float(self._pay_edit.text())
@@ -317,20 +403,38 @@ class HourlyForm(EmployeeForm):
 
 
 class TempForm(HourlyForm):
+    """Jack Bellgowan
+
+    """
     def __init__(self, parent, employee):
+        """Jack Bellgowan
+
+        """
         super().__init__(parent, employee)
 
 
     def fill_in(self, index) -> None:
+        """Jack Bellgowan
+
+        """
         super().fill_in(index)
         self.layout.addRow(QLabel("Last day: "), QLabel(str(self._employee.last_day)))
 
 
 class PermanentForm(HourlyForm):
+    """Jack Bellgowan
+
+    """
     def __init__(self, parent, employee):
+        """Jack Bellgowan
+
+        """
         super().__init__(parent, employee)
 
     def fill_in(self, index) -> None:
+        """Jack Bellgowan
+
+        """
         super().fill_in(index)
         self.layout.addRow(QLabel("Hired date: "), QLabel(str(self._employee.hired_date)))
 
@@ -350,7 +454,8 @@ class AboutForm(QtWidgets.QWidget):
         self.setLayout(self.layout)
 
     def close_form(self) -> None:
-        """Hide the form."""
+        """
+        Hide the form."""
         self.setVisible(False)
 
 
