@@ -231,7 +231,10 @@ class EmployeeForm(QtWidgets.QWidget):
             # changes employee name
             self._employee.email = self._email_edit.text()
             # changes employee name
-            self._employee.image = self._image_path_edit.text()
+            if self._image_path_edit.text():
+                self._employee.image = self._image_path_edit.text()
+            else:
+                self._employee.image = self._employee.IMAGE_PLACEHOLDER
         except ValueError as error:
             # opens error window
             self.error_handler(error)
